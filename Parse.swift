@@ -1,6 +1,6 @@
 //
 //  Parse.swift
-//  TypeParse
+//  WhichSide
 //
 //  Created by Fabian Canas on 7/9/15.
 //  Copyright (c) 2015 Fabián Cañas. All rights reserved.
@@ -23,6 +23,7 @@ enum Constraint {
     case Descending(String)
     case Exists(String)
     case DoesNotExist(String)
+    case HasPrefix(key: String, prefix: String)
 }
 
 extension Constraint :Equatable {}
@@ -53,6 +54,13 @@ func == (lhs: Constraint, rhs: Constraint) -> Bool {
     case .DoesNotExist(let lKey):
         switch (rhs) {
         case .DoesNotExist(let rKey) where lKey == rKey:
+            return true
+        default:
+            return false
+        }
+    case .HasPrefix(key: let lKey, prefix: let lPrefix):
+        switch (rhs) {
+        case .HasPrefix(key: let rKey, prefix: let rPrefix) where lKey == rKey && lPrefix == rPrefix:
             return true
         default:
             return false
@@ -96,6 +104,9 @@ struct Query<T :Model> {
                 break
             case .DoesNotExist(let key):
                 q.whereKeyDoesNotExist(key)
+                break
+            case .HasPrefix(key: let key, prefix: let prefix):
+                q.whereKey(key, hasPrefix: prefix)
                 break
             }
         }
