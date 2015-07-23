@@ -24,7 +24,9 @@ enum Constraint {
     case Exists(String)
     case DoesNotExist(String)
     case HasPrefix(key: String, prefix: String)
-}
+    case LessThan(key: String, value: Double)
+    case Limit(Int)
+  }
 
 extension Constraint :Equatable {}
 
@@ -61,6 +63,13 @@ func == (lhs: Constraint, rhs: Constraint) -> Bool {
     case .HasPrefix(key: let lKey, prefix: let lPrefix):
         switch (rhs) {
         case .HasPrefix(key: let rKey, prefix: let rPrefix) where lKey == rKey && lPrefix == rPrefix:
+            return true
+        default:
+            return false
+        }
+    case .Limit(let lLimit):
+        switch (rhs) {
+        case .Limit(let rLimit):
             return true
         default:
             return false
@@ -108,6 +117,8 @@ struct Query<T :Model> {
             case .HasPrefix(key: let key, prefix: let prefix):
                 q.whereKey(key, hasPrefix: prefix)
                 break
+            case .Limit(let limit):
+                q.limit = limit
             }
         }
 
